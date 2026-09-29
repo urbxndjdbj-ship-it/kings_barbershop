@@ -2,9 +2,12 @@
     <application
         android:label="حلاقة الملوك"
         android:icon="@mipmap/ic_launcher">
+        
+        <!-- إجبار استخدام v2 embedding في فلاتر -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
         <activity
             android:name="io.flutter.embedding.android.FlutterActivity"
             android:exported="true"
