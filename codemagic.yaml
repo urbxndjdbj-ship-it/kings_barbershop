@@ -6,9 +6,10 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Set up Flutter
+      - name: Set up Flutter and Generate Launcher Icons
         script: |
           flutter packages pub get
+          dart run flutter_launcher_icons
       - name: Build Android APK
         script: |
           flutter build apk --release
