@@ -237,7 +237,7 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
     }
   }
 
-  // ================= 1. قسم السُلف مع جدول تم/لم يتم الدفع =================
+  // ================= 1. قسم السُلف =================
   Widget _buildSolfaPage(Color cardColor, Color textColor) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -357,7 +357,6 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
     );
   }
 
-  // نافذة إنشاء ملف سُلفة جديد
   void _showCreateSolfaFolderDialog() {
     final titleCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
@@ -396,7 +395,6 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
     );
   }
 
-  // نافذة إضافة مشترك (اسم ورقم هاتف فقط بدون خيار الدفع)
   void _showAddMemberDialog(Map<String, dynamic> group) {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
@@ -422,7 +420,7 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
                   (group['members'] as List).add({
                     "name": nameCtrl.text,
                     "phone": phoneCtrl.text,
-                    "paid": false, // القيمة الافتراضية عند الإضافة هي "لم يتم الدفع"
+                    "paid": false,
                   });
                 });
                 Navigator.pop(ctx);
@@ -458,7 +456,7 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
             child: bookings.isEmpty
                 ? const Center(
                     child: Text(
-                      "لا توجد حجوزات حتي الآن.\nاضغط على زر (إضافة زبون) لتسجيل حجز جديد.",
+                      "لا توجد حجوزات حتى الآن.\nاضغط على زر (إضافة زبون) لتسجيل حجز جديد.",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
@@ -649,7 +647,7 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
                     children: [
                       const Text("إجمالي الدخل", style: TextStyle(color: Colors.grey, fontSize: 12)),
                       const SizedBox(height: 4),
-                      Text("${totalIncome.toStringAsFixed(0)}", style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(totalIncome.toStringAsFixed(0), style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 16, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -673,6 +671,39 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditAccountDialog() {
+    final nameCtrl = TextEditingController(text: userName);
+    final phoneCtrl = TextEditingController(text: userPhone);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("تعديل البيانات الشخصية"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "الاسم")),
+            TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: "رقم الهاتف")),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("إلغاء")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37)),
+            onPressed: () {
+              setState(() {
+                userName = nameCtrl.text;
+                userPhone = phoneCtrl.text;
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text("حفظ", style: TextStyle(color: Colors.black)),
+          )
         ],
       ),
     );
@@ -712,7 +743,7 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37)),
                       onPressed: () => _showAddIncomeDialog(setModalState),
                       icon: const Icon(Icons.add, color: Colors.black, size: 20),
-                      label: const Text("إضافة دخلك المالي", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      label: const Text("إضافة دخل", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),
@@ -723,39 +754,39 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFD4AF37).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD4AF37)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("المجموع الإجمالي للدخل:", style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text("${total.toStringAsFixed(0)} د.ع", style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text("إجمالي الأرباح المسجلة:", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                      Text("${total.toStringAsFixed(0)} د.ع", style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 18, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text("سجل الدخل المالي المضاف:", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
                 Expanded(
                   child: dailyIncomes.isEmpty
                       ? const Center(
-                          child: Text("لا يوجد دخل مالي مضاف حالياً.\nاضغط على زر (إضافة دخلك المالي) للتسجيل.",
-                              textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+                          child: Text("لا توجد سجلات مالية بعد.", style: TextStyle(color: Colors.grey)),
                         )
                       : ListView.builder(
                           itemCount: dailyIncomes.length,
-                          itemBuilder: (context, idx) {
-                            final item = dailyIncomes[idx];
+                          itemBuilder: (context, index) {
+                            final item = dailyIncomes[index];
                             return Card(
-                              color: isDarkMode ? const Color(0xFF0B0F17) : const Color(0xFFF8FAFC),
+                              color: isDarkMode ? const Color(0xFF0B0F17) : const Color(0xFFF1F5F9),
+                              margin: const EdgeInsets.only(bottom: 8),
                               child: ListTile(
-                                leading: const Icon(Icons.monetization_on, color: Colors.green),
-                                title: Text("${item['day']} - ${item['date']}", style: TextStyle(color: textColor)),
-                                trailing: Text("${item['amount']} د.ع", style: const TextStyle(color: Color(0xFFD4AF37), fontSize: 16, fontWeight: FontWeight.bold)),
+                                leading: const Icon(Icons.monetization_on, color: Color(0xFFD4AF37)),
+                                title: Text(item['title'], style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                                subtitle: Text(item['date'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                trailing: Text("${item['amount']} د.ع", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16)),
                               ),
                             );
                           },
                         ),
-                ),
+                )
               ],
             ),
           );
@@ -764,53 +795,19 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
     );
   }
 
-  void _showEditAccountDialog() {
-    final nameCtrl = TextEditingController(text: userName);
-    final phoneCtrl = TextEditingController(text: userPhone);
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("تعديل الحساب"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "تغيير اسم المستخدم")),
-            TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: "تعديل رقم الهاتف")),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("إلغاء")),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                userName = nameCtrl.text;
-                userPhone = phoneCtrl.text;
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text("حفظ"),
-          )
-        ],
-      ),
-    );
-  }
-
-  void _showAddIncomeDialog(StateSetter updateModalState) {
+  void _showAddIncomeDialog(StateSetter setModalState) {
+    final titleCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
-    final dayCtrl = TextEditingController(text: "اليوم");
-    final dateCtrl = TextEditingController(text: "2026-10-01");
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("إضافة دخلك المالي"),
+        title: const Text("إضافة دخل مالي جديد"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: dayCtrl, decoration: const InputDecoration(labelText: "اليوم (مثال: الخميس)")),
-            TextField(controller: dateCtrl, decoration: const InputDecoration(labelText: "التاريخ (مثال: 2026-10-01)")),
-            TextField(controller: amountCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "الدخل المالي (د.ع)")),
+            TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: "بيان / مصدر الدخل (مثال: حلاقة عريس)")),
+            TextField(controller: amountCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "المبلغ")),
           ],
         ),
         actions: [
@@ -818,20 +815,20 @@ class _KingsBarbershopAppState extends State<KingsBarbershopApp> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD4AF37)),
             onPressed: () {
-              double val = double.tryParse(amountCtrl.text) ?? 0;
-              if (val > 0) {
+              if (titleCtrl.text.isNotEmpty && amountCtrl.text.isNotEmpty) {
+                double amount = double.tryParse(amountCtrl.text) ?? 0;
                 setState(() {
-                  dailyIncomes.insert(0, {
-                    "day": dayCtrl.text,
-                    "date": dateCtrl.text,
-                    "amount": val,
+                  dailyIncomes.add({
+                    "title": titleCtrl.text,
+                    "amount": amount,
+                    "date": DateTime.now().toString().split(' ')[0],
                   });
                 });
-                updateModalState(() {});
+                setModalState(() {});
                 Navigator.pop(ctx);
               }
             },
-            child: const Text("تسجيل", style: TextStyle(color: Colors.black)),
+            child: const Text("إضافة", style: TextStyle(color: Colors.black)),
           )
         ],
       ),
